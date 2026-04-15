@@ -1,0 +1,57 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cmath>
+
+using namespace std;
+
+#define D 256 // Number of characters in the input alphabet
+#define Q 101 // A prime number for modular arithmetic
+
+void rabinKarpSearch(string text, string pattern) {
+    int n = text.length();
+    int m = pattern.length();
+    int p = 0; // Hash value for pattern
+    int t = 0; // Hash value for text window
+    int h = 1;
+
+    // The value of h would be "pow(D, m-1) % Q"
+    for (int i = 0; i < m - 1; i++)
+        h = (h * D) % Q;
+
+    // Calculate initial hash value of pattern and first window of text
+    for (int i = 0; i < m; i++) {
+        p = (D * p + pattern[i]) % Q;
+        t = (D * t + text[i]) % Q;
+    }
+
+    // Slide the pattern over text one by one
+    for (int i = 0; i <= n - m; i++) {
+        // If hash values match, check characters one by one
+        if (p == t) {
+            int j;
+            for (j = 0; j < m; j++) {
+                if (text[i + j] != pattern[j])
+                    break;
+            }
+            if (j == m)
+                cout << "Pattern found at index " << i << endl;
+        }
+
+        // Calculate hash value for next window of text
+        if (i < n - m) {
+            t = (D * (t - text[i] * h) + text[i + m]) % Q;
+
+            // We might get negative value of t, converting it to positive
+            if (t < 0)
+                t = (t + Q);
+        }
+    }
+}
+
+int main() {
+    string text = "GEEKS FOR GEEKS";
+    string pattern = "GEEK";
+    rabinKarpSearch(text, pattern);
+    return 0;
+}
